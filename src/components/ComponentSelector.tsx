@@ -27,7 +27,7 @@ const ComponentSelector: React.FC<Props> = ({ selected, setSelected, viewMode })
   const [components, setComponents] = useState<ComponentsData>({});
 
   useEffect(() => {
-    axios.get('http://localhost:8000/components')
+    axios.get('https://bconf.onrender.com/components')
       .then(res => setComponents(res.data));
   }, []);
 
