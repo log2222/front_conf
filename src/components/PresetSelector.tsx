@@ -15,7 +15,7 @@ const PresetSelector: React.FC<Props> = ({ onSelect }) => {
   const [presets, setPresets] = useState<Preset[]>([]);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/presets')
+    axios.get('https://bconf.onrender.com/presets')
       .then(res => {
         // Корректно приводим SSD и RAM к массиву, если это не массив
         const processedPresets = res.data.map((preset: any) => ({
