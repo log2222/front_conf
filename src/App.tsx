@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, Card, Divider, ToggleButton, ToggleButtonGroup, Button } from '@mui/material';
+import { Container, Box, Typography, Card, Divider, ToggleButton, ToggleButtonGroup, Button, Chip } from '@mui/material';
 import PresetSelector from './components/PresetSelector';
 import ComponentSelector from './components/ComponentSelector';
 import BuildSummary from './components/BuildSummary';
 import axios from 'axios';
+import { API_ENDPOINTS } from './config';
+import { useApiConfig } from './hooks/useApiConfig';
 
 interface ComponentOption {
   name: string;
@@ -22,11 +24,29 @@ const App: React.FC = () => {
   const [selected, setSelected] = useState<SelectedComponents>({});
   const [components, setComponents] = useState<ComponentsData>({});
   const [viewMode, setViewMode] = useState<'full' | 'short'>('full');
+  
+  // Используем новый хук для конфигурации
+  const apiConfig = useApiConfig();
 
   useEffect(() => {
-    axios.get('https://bconf.onrender.com/components')
-      .then(res => setComponents(res.data));
-  }, []);
+    console.log('Loading components from:', API_ENDPOINTS.components);
+    console.log('Current environment:', apiConfig.environment);
+    
+    axios.get(API_ENDPOINTS.components)
+      .then(res => {
+        console.log('Components loaded successfully:', Object.keys(res.data));
+        setComponents(res.data);
+      })
+      .catch(error => {
+        console.error('Error loading components:', error);
+        console.error('Error details:', {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          url: error.config?.url
+        });
+      });
+  }, [apiConfig.environment]);
 
   const handlePresetSelect = (presetComponents: SelectedComponents) => {
     setSelected(presetComponents);
@@ -41,6 +61,17 @@ const App: React.FC = () => {
       <Typography variant="h4" gutterBottom align="center" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
         Конфигуратор ПК
       </Typography>
+      
+      {/* Индикатор окружения (только в development) */}
+      {apiConfig.isDevelopment && (
+        <Box mb={2} display="flex" justifyContent="center">
+          <Chip 
+            label={`${apiConfig.environment.toUpperCase()} - ${apiConfig.apiBaseUrl}`}
+            color="warning"
+            size="small"
+          />
+        </Box>
+      )}
       
       <Box mb={3}>
         <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>Готовые конфигурации</Typography>
