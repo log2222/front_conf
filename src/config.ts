@@ -2,9 +2,8 @@ import { getCurrentConfig, getCurrentEnvironment } from './config/environments';
 
 // Универсальная конфигурация API URL
 const getApiBaseUrl = (): string => {
-  // Приоритет 1: Переменная окружения (если установлена)
-  if ((import.meta as any).env?.VITE_API_BASE_URL) {
-    return (import.meta as any).env.VITE_API_BASE_URL;
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
   }
   
   // Приоритет 2: Автоматическое определение на основе домена
