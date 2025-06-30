@@ -5,7 +5,7 @@ import ComponentSelector from './components/ComponentSelector';
 import BuildSummary from './components/BuildSummary';
 import axios from 'axios';
 import { API_ENDPOINTS } from './config';
-import { useApiConfig } from './hooks/useApiConfig';
+
 
 interface ComponentOption {
   name: string;
