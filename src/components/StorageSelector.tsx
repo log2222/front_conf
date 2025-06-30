@@ -47,7 +47,7 @@ const StorageSelector: React.FC<Props> = ({ selected, setSelected, viewMode, cat
   const [selectedStorage, setSelectedStorage] = useState<SelectedStorage[]>([]);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/components')
+    axios.get('https://bconf.onrender.com/components')
       .then(res => {
         const storageData = res.data[category] || [];
         setStorageOptions(storageData);
