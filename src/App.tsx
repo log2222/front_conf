@@ -24,7 +24,7 @@ const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<'full' | 'short'>('full');
 
   useEffect(() => {
-    axios.get('http://localhost:8000/components')
+    axios.get('https://bconf.onrender.com/components')
       .then(res => setComponents(res.data));
   }, []);
 
