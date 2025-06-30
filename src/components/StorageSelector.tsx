@@ -16,6 +16,7 @@ import {
   TextField
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { API_ENDPOINTS } from '../config';
 
 interface StorageOption {
   name: string;
@@ -47,7 +48,7 @@ const StorageSelector: React.FC<Props> = ({ selected, setSelected, viewMode, cat
   const [selectedStorage, setSelectedStorage] = useState<SelectedStorage[]>([]);
 
   useEffect(() => {
-    axios.get('https://bconf.onrender.com/components')
+    axios.get(API_ENDPOINTS.components)
       .then(res => {
         const storageData = res.data[category] || [];
         setStorageOptions(storageData);
@@ -93,148 +94,3 @@ const StorageSelector: React.FC<Props> = ({ selected, setSelected, viewMode, cat
   };
 
   const handleQuantityChange = (storageName: string, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      const newSelected = selected.filter(name => name !== storageName);
-      setSelected(newSelected);
-    } else {
-      const currentCount = selected.filter(name => name === storageName).length;
-      const difference = newQuantity - currentCount;
-      
-      let newSelected = [...selected];
-      
-      if (difference > 0) {
-        for (let i = 0; i < difference; i++) {
-          if (newSelected.length < 4) {
-            newSelected.push(storageName);
-          }
-        }
-      } else if (difference < 0) {
-        const toRemove = Math.abs(difference);
-        let removed = 0;
-        newSelected = newSelected.filter(name => {
-          if (name === storageName && removed < toRemove) {
-            removed++;
-            return false;
-          }
-          return true;
-        });
-      }
-      
-      setSelected(newSelected);
-    }
-  };
-
-  const getTotalPrice = () => {
-    return selected.reduce((total, storageName) => {
-      const storage = storageOptions.find(opt => opt.name === storageName);
-      return total + (storage?.price || 0);
-    }, 0);
-  };
-
-  if (viewMode === 'short') {
-    return (
-      <Box>
-        <Typography variant="body1" color="text.secondary">
-          Выбрано {category}: {selected.length}/4
-        </Typography>
-      </Box>
-    );
-  }
-
-  return (
-    <Box>
-      {/* <Typography variant="h6" gutterBottom>
-        {category}
-      </Typography> */}
-      
-      {/* Выбранные накопители */}
-      {selected.length > 0 && (
-        <Box mb={2}>
-          <Typography variant="subtitle2" gutterBottom>
-            Выбранные накопители ({selected.length}/4):
-          </Typography>
-          <Box display="flex" flexDirection="column" gap={1}>
-            {selectedStorage.map((item, index) => {
-              const storage = storageOptions.find(opt => opt.name === item.name);
-              const maxQuantity = 4 - selected.length + item.quantity;
-              
-              return (
-                <Card key={index} variant="outlined">
-                  <CardContent sx={{ py: 1, px: 2 }}>
-                    <Box display="flex" alignItems="center" justifyContent="space-between">
-                      <Box flex={1}>
-                        <Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
-                          {item.name}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {storage?.type} • {storage?.price} ₽ за накопитель
-                          {storage?.capacity_raw && ` • ${storage.capacity_raw}`}
-                        </Typography>
-                      </Box>
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <TextField
-                          type="number"
-                          size="small"
-                          label="Кол-во"
-                          value={item.quantity}
-                          onChange={(e) => {
-                            const newQuantity = parseInt(e.target.value) || 0;
-                            handleQuantityChange(item.name, newQuantity);
-                          }}
-                          inputProps={{ 
-                            min: 0, 
-                            max: maxQuantity,
-                            style: { width: 60 }
-                          }}
-                          sx={{ width: 80 }}
-                        />
-                        <IconButton 
-                          size="small" 
-                          onClick={() => handleQuantityChange(item.name, 0)}
-                          color="error"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </Box>
-        </Box>
-      )}
-
-      {/* Добавление нового накопителя */}
-      {selected.length < 4 && (
-        <FormControl fullWidth margin="normal">
-          <InputLabel>SSD</InputLabel>
-          <Select
-            value=""
-            label="SSD"
-            onChange={(e) => handleAddStorage(e.target.value as string)}
-          >
-            <MenuItem value="">Выберите накопитель</MenuItem>
-            {sortStorageOptions(storageOptions).map(opt => (
-              <MenuItem value={opt.name} key={opt.name}>
-                {opt.name} ({opt.price} ₽)
-                {opt.capacity_raw && ` • ${opt.capacity_raw}`}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )}
-
-      {/* Общая стоимость */}
-      {selected.length > 0 && (
-        <Box mt={2} p={2} bgcolor="grey.100" borderRadius={1}>
-          <Typography variant="subtitle1">
-            Общая стоимость {category}: {getTotalPrice()} ₽
-          </Typography>
-        </Box>
-      )}
-    </Box>
-  );
-};
-
-export default StorageSelector; 
