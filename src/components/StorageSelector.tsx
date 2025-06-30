@@ -94,7 +94,6 @@ const StorageSelector: React.FC<Props> = ({ selected, setSelected, viewMode, cat
   };
 
   const handleQuantityChange = (storageName: string, newQuantity: number) => {
-      const handleQuantityChange = (storageName: string, newQuantity: number) => {
     if (newQuantity <= 0) {
       const newSelected = selected.filter(name => name !== storageName);
       setSelected(newSelected);
