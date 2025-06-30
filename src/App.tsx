@@ -26,7 +26,7 @@ const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<'full' | 'short'>('full');
   
   // Используем новый хук для конфигурации
-  const apiConfig = useApiConfig();
+  
 
   useEffect(() => {
     console.log('Loading components from:', API_ENDPOINTS.components);
