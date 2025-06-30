@@ -4,33 +4,42 @@ import { Box, Button, Typography, Stack } from '@mui/material';
 
 interface Preset {
   name: string;
-  components: { [category: string]: string };
+  components: { [category: string]: string | string[] };
 }
 
 interface Props {
-  onSelect: (components: { [category: string]: string }) => void;
+  onSelect: (components: { [category: string]: string | string[] }) => void;
 }
 
 const PresetSelector: React.FC<Props> = ({ onSelect }) => {
   const [presets, setPresets] = useState<Preset[]>([]);
 
   useEffect(() => {
-    axios.get('https://bconf.onrender.com/presets')
-      .then(res => setPresets(res.data));
+    axios.get('http://localhost:8000/presets')
+      .then(res => {
+        // Корректно приводим SSD и RAM к массиву, если это не массив
+        const processedPresets = res.data.map((preset: any) => ({
+          ...preset,
+          components: {
+            ...preset.components,
+            'SSD': Array.isArray(preset.components['SSD']) ? preset.components['SSD'] : (preset.components['SSD'] ? [preset.components['SSD']] : []),
+            'RAM': Array.isArray(preset.components['RAM']) ? preset.components['RAM'] : (preset.components['RAM'] ? [preset.components['RAM']] : [])
+          }
+        }));
+        setPresets(processedPresets);
+      });
   }, []);
 
   return (
     <Box mb={2}>
       <Typography variant="h6" gutterBottom fontWeight={600} color="primary.dark">Типовые конфигурации</Typography>
-      <Stack direction="row" spacing={2} flexWrap="wrap">
-        {presets.map((preset, idx) => (
+      <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+        {presets.map((preset, index) => (
           <Button
-            key={preset.name}
-            variant={idx % 2 === 0 ? "contained" : "outlined"}
-            color={idx % 3 === 0 ? "primary" : idx % 3 === 1 ? "secondary" : "success"}
-            size="large"
+            key={index}
+            variant="outlined"
             onClick={() => onSelect(preset.components)}
-            sx={{ mb: 1, minWidth: 160 }}
+            sx={{ minWidth: 120 }}
           >
             {preset.name}
           </Button>
