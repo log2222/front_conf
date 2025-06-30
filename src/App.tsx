@@ -15,7 +15,7 @@ interface ComponentsData {
 }
 
 interface SelectedComponents {
-  [category: string]: string;
+  [category: string]: string | string[];
 }
 
 const App: React.FC = () => {
@@ -28,30 +28,63 @@ const App: React.FC = () => {
       .then(res => setComponents(res.data));
   }, []);
 
+  const handlePresetSelect = (presetComponents: SelectedComponents) => {
+    setSelected(presetComponents);
+  };
+
+  const clearSelection = () => {
+    setSelected({});
+  };
+
   return (
-    <Container maxWidth="md" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <Card sx={{ p: 4, minWidth: 400, maxWidth: 600, boxShadow: 6, borderRadius: 4 }}>
-          <Typography variant="h3" align="center" color="primary" gutterBottom fontWeight={700}>
-            Конфигуратор ПК
-          </Typography>
-          <Divider sx={{ my: 2 }} />
-          <ToggleButtonGroup
-            value={viewMode}
-            exclusive
-            onChange={(_, val) => val && setViewMode(val)}
-            sx={{ mb: 2 }}
-          >
-            <ToggleButton value="full">Полная</ToggleButton>
-            <ToggleButton value="short">Краткая</ToggleButton>
-          </ToggleButtonGroup>
-          <Button variant="outlined" color="secondary" sx={{ mb: 2 }} onClick={() => setSelected({})}>
-            Очистить всё
-          </Button>
-          <PresetSelector onSelect={setSelected} />
-          <Divider sx={{ my: 2 }} />
-          <ComponentSelector selected={selected} setSelected={setSelected} viewMode={viewMode} />
-          <Divider sx={{ my: 2 }} />
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography variant="h4" gutterBottom align="center">
+        Конфигуратор ПК
+      </Typography>
+      
+      <Box mb={3}>
+        <Typography variant="h6" gutterBottom>Готовые конфигурации</Typography>
+        <PresetSelector onSelect={handlePresetSelect} />
+      </Box>
+
+      <Divider sx={{ my: 3 }} />
+
+      <Box mb={3}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6">Выбор комплектующих</Typography>
+          <Box>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={(_, newMode) => newMode && setViewMode(newMode)}
+              size="small"
+            >
+              <ToggleButton value="full">Полный</ToggleButton>
+              <ToggleButton value="short">Краткий</ToggleButton>
+            </ToggleButtonGroup>
+            <Button 
+              variant="outlined" 
+              onClick={clearSelection}
+              sx={{ ml: 2 }}
+            >
+              Очистить
+            </Button>
+          </Box>
+        </Box>
+        
+        <Card sx={{ p: 3 }}>
+          <ComponentSelector 
+            selected={selected} 
+            setSelected={setSelected} 
+            viewMode={viewMode} 
+          />
+        </Card>
+      </Box>
+
+      <Divider sx={{ my: 3 }} />
+
+      <Box>
+        <Card sx={{ p: 3 }}>
           <BuildSummary selected={selected} components={components} />
         </Card>
       </Box>
