@@ -5,7 +5,7 @@ import ComponentSelector from './components/ComponentSelector';
 import BuildSummary from './components/BuildSummary';
 import axios from 'axios';
 import { API_ENDPOINTS } from './config';
-
+import { useApiConfig } from './hooks/useApiConfig';
 
 interface ComponentOption {
   name: string;
@@ -26,7 +26,7 @@ const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<'full' | 'short'>('full');
   
   // Используем новый хук для конфигурации
-  
+  const apiConfig = useApiConfig();
 
   useEffect(() => {
     console.log('Loading components from:', API_ENDPOINTS.components);
